@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head}"></head>
+<body>
+    <div th:replace="~{fragments/layout :: header}"></div>
+
+    <div class="container mt-5">
+        <div class="card border-0 shadow-sm mx-auto" style="max-width: 600px;">
+            <div class="card-header bg-dark text-white border-bottom border-success border-3">
+                <h2 class="mb-0 h5"><i class="bi bi-plus-lg text-success"></i> Novo Lançamento</h2>
+            </div>
+            <div class="card-body p-4">
+                <form th:action="@{/lancamentos/salvar}" th:object="${lancamento}" method="post">
+                    
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Descrição</label>
+                        <input type="text" th:field="*{descricao}" class="form-control" placeholder="Ex: INVESTIMENTO, MERCADO">
+                        <div class="text-danger small" th:if="${#fields.hasErrors('descricao')}" th:errors="*{descricao}"></div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">Valor (R$)</label>
+                            <input type="number" step="0.01" th:field="*{valor}" class="form-control border-success-subtle">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">Data</label>
+                            <input type="date" th:field="*{dataLancamento}" class="form-control">
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Tipo</label>
+                        <select th:field="*{tipo}" class="form-select">
+                            <option th:each="t : ${tipos}" th:value="${t}" th:text="${t}"></option>
+                        </select>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">Categoria</label>
+                        <input type="text" th:field="*{categoria}" class="form-control" placeholder="Ex: ATIVO, LAZER">
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-finedu fw-bold py-2">Salvar Lançamento</button>
+                        <a th:href="@{/lancamentos}" class="btn btn-link text-dark text-decoration-none">Voltar ao Painel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div th:replace="~{fragments/layout :: footer}"></div>
+</body>
+</html>

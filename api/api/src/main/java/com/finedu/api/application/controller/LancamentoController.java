@@ -31,6 +31,12 @@ public class LancamentoController {
         model.addAttribute("tipos", TipoLancamento.values());
         return "lancamentos/formulario";
     }
+    
+    @GetMapping("/excluir/{id}")
+    public String excluirLancamento(@PathVariable("id") Long id) {
+        lancamentoService.excluirLancamento(id);
+        return "redirect:/lancamentos";
+    }
 
     @PostMapping("/salvar")
     public String salvarNovoLancamento(@Valid @ModelAttribute("lancamento") LancamentoFinanceiro lancamento, 
@@ -42,4 +48,5 @@ public class LancamentoController {
         lancamentoService.registrarNovoLancamento(lancamento);
         return "redirect:/lancamentos";
     }
+    
 }

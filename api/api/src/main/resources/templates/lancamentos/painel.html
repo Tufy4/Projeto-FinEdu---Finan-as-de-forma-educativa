@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <div th:replace="~{fragments/layout :: head}"></div>
+    <style>
+        .popover { border: 1px solid #28a745; }
+        .popover-header { background-color: #000; color: #28a745; font-size: 0.8rem; border-bottom: 1px solid #28a745; }
+    </style>
+</head>
+<body>
+    <div th:replace="~{fragments/layout :: header}"></div>
+
+    <div class="container">
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm bg-white">
+                    <div class="card-body">
+                        <h6 class="text-muted text-uppercase small fw-bold">Ativos (Entradas)</h6>
+                        <h3 class="text-success fw-bold" th:text="'R$ ' + ${#aggregates.sum(lancamentos.?[tipo.name() == 'ENTRADA'].![valor]) ?: '0.00'}"></h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm bg-white">
+                    <div class="card-body">
+                        <h6 class="text-muted text-uppercase small fw-bold">Passivos (Saídas)</h6>
+                        <h3 class="text-danger fw-bold" th:text="'R$ ' + ${#aggregates.sum(lancamentos.?[tipo.name() == 'SAIDA'].![valor]) ?: '0.00'}"></h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm" 
+                     th:with="saldo=${(#aggregates.sum(lancamentos.?[tipo.name() == 'ENTRADA'].![valor]) ?: 0) - (#aggregates.sum(lancamentos.?[tipo.name() == 'SAIDA'].![valor]) ?: 0)}"
+                     th:classappend="${saldo >= 0 ? 'bg-success text-white' : 'bg-dark text-white'}">
+                    <div class="card-body">
+                        <h6 class="text-uppercase small fw-bold">Balanço Geral</h6>
+                        <h3 class="fw-bold" th:text="'R$ ' + ${saldo}"></h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card border-0 shadow-sm p-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h4 class="fw-bold m-0"><i class="bi bi-list-ul text-success"></i> Transações</h4>
+                <a th:href="@{/lancamentos/novo}" class="btn btn-finedu"><i class="bi bi-plus-lg"></i> Novo</a>
+            </div>
+            
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Data</th>
+                            <th>Descrição</th>
+                            <th>Categoria</th>
+                            <th class="text-end">Valor</th>
+                            <th class="text-center">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="l : ${lancamentos}">
+                            <td th:text="${#temporals.format(l.dataLancamento, 'dd/MM/yyyy')}"></td>
+                            <td th:text="${l.descricao}" class="fw-medium"></td>
+                            <td><span class="badge rounded-pill bg-light text-dark border" th:text="${l.categoria}"></span></td>
+                            <td class="text-end fw-bold" 
+                                th:classappend="${l.tipo.name() == 'ENTRADA' ? 'text-success' : 'text-danger'}"
+                                th:text="${l.tipo.name() == 'ENTRADA' ? '+ R$ ' + l.valor : '- R$ ' + l.valor}"></td>
+                            
+                            <td class="text-center">
+                                <a href="javascript:void(0);" 
+                                   class="text-danger fs-5" 
+                                   data-bs-toggle="popover" 
+                                   th:data-bs-id="${l.id}"
+                                   title="Excluir?">
+                                    <i class="bi bi-trash3-fill"></i>
+                                </a>
+
+                                <div th:id="'popover-content-' + ${l.id}" class="d-none">
+                                    <p class="small mb-2 fw-bold">Confirmar exclusão?</p>
+                                    <div class="d-flex gap-2">
+                                        <a th:href="@{/lancamentos/excluir/{id}(id=${l.id})}" class="btn btn-danger btn-sm">Sim</a>
+                                        <button type="button" class="btn btn-light btn-sm close-popover">Não</button>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div th:replace="~{fragments/layout :: footer}"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script th:src="@{/js/dashboard.js}"></script>
+</body>
+</html>
